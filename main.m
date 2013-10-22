@@ -55,7 +55,7 @@ while(1)
     
     % Input desired delta position
     deltaPos = [0;0;0];
-    deltaX = 0.05; deltaY = 0.05; deltaZ = 0.05;
+    deltaX = 0.04; deltaY = 0.04; deltaZ = 0.06;
     clc;
     display('Press w(forward),a(left),s(backward),d(right),q(up),e(down),x(stop)');
     pause(0.01);
@@ -84,7 +84,7 @@ while(1)
     
     % Calculate desired joint angle velocities
     if any(deltaPose)
-        qDot = J'*inv(J*J' + (1e-3)^2*eye(6,6))*deltaPose;
+        qDot = J'*inv(J*J' + 0.1^2*eye(6,6))*deltaPose;
         % Limit angular joint velocity to +/- 2.5
         for k = 1:length(qDot)
             if abs(qDot(k)) > 2.5

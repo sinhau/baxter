@@ -7,10 +7,9 @@ function setBaxterConstants
     % - Origin is at the base of first joint for both arms
     % - Zero configuration is when the joint_states.position reads 0 for all
     %   joints.
-    % - Before rotation, y-axis is in the direction the arm is stretched
-    %   out in zero configuration
-    % - Position and rotation vectors are rotated such that the x-axis for both arms
-    %   point straight out in front of Baxter
+    % - Y-axis is in the direction the arm is stretched
+    %   out inzero configuration, Z-axis points straight up
+
     
     % Setting up left arm parameters
     leftArm.P = [[0;0;0],[0;0.1;0.235],[0;0.1;0],[0;0.24;-0.095],[0;0.09;0],[0;0.28;-0.02],[0;0.18;0],[0;0.17;0]];
@@ -20,8 +19,8 @@ function setBaxterConstants
     baxterconst.leftArm = leftArm;
     
     % Setting up right arm parameters
-    rightArm.P = rot(z,(pi/4)+(pi/2))*[[0;0;0],[0;0.1;0.235],[0;0.1;0],[0;0.24;-0.095],[0;0.09;0],[0;0.28;-0.02],[0;0.18;0],[0;0.17;0]];
-    rightArm.H = rot(z,(pi/4)+(pi/2))*[z,-x,y,-x,y,-x,y];
+    rightArm.P = [[0;0;0],[0;0.1;0.235],[0;0.1;0],[0;0.24;-0.095],[0;0.09;0],[0;0.28;-0.02],[0;0.18;0],[0;0.17;0]];
+    rightArm.H = [z,-x,y,-x,y,-x,y];
     rightArm.type = [0,0,0,0,0,0,0];
     rightArm.n = 7;
     baxterconst.rightArm = rightArm;

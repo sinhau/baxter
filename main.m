@@ -53,11 +53,9 @@ while(1)
     % Calculate full jacobian for left arm
     J = jacobian(baxterConst.leftArm,jointAnglesLeft);
     
-    % Input desired end-effector velocity
-    linVel = [0;0;0];
-    deltaX = 0.05;
-    deltaY = 0.05;
-    deltaZ = 0.05;
+    % Input desired delta position
+    deltaPos = [0;0;0];
+    deltaX = 0.05; deltaY = 0.05; deltaZ = 0.05;
     clc;
     display('Press w(forward),a(left),s(backward),d(right),q(up),e(down),x(stop)');
     pause(0.01);
@@ -67,26 +65,26 @@ while(1)
     end
     switch keyPress
         case 'W'
-            linVel(1) = deltaX;
+            deltaPos(1) = deltaX;
         case 'A'
-            linVel(2) = deltaY; 
+            deltaPos(2) = deltaY; 
         case 'S'
-            linVel(1) = -deltaX; 
+            deltaPos(1) = -deltaX; 
         case 'D'
-            linVel(2) = -deltaY;   
+            deltaPos(2) = -deltaY;   
         case 'Q'
-            linVel(3) = deltaZ;
+            deltaPos(3) = deltaZ;
         case 'E'
-            linVel(3) = -deltaZ; 
+            deltaPos(3) = -deltaZ; 
         otherwise 
-            linVel = [0;0;0];         
+            deltaPos = [0;0;0];         
     end
-    linVelCorrect = rot([0;0;1],pi/4)*linVel;
-    desVel = [0;0;0;linVelCorrect];
+    deltaPosCorrect = rot([0;0;1],pi/4)*deltaPos; % Rotate frame such that x-axis points in front of baxter
+    deltaPose = [0;0;0;deltaPosCorrect];
     
     % Calculate desired joint angle velocities
-    if any(desVel)
-        qDot = J\desVel;
+    if any(deltaPose)
+        qDot = J'*inv(J*J' + (1e-3)^2*eye(6,6))*deltaPose;
         % Limit angular joint velocity to +/- 2.5
         for k = 1:length(qDot)
             if abs(qDot(k)) > 2.5

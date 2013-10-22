@@ -86,7 +86,7 @@ while(1)
     dampCoeff = 0.1;
     if any(deltaPose)
         qDot = J'*inv(J*J' + dampCoeff^2*eye(6,6))*deltaPose;
-        % Limit angular joint velocity to +/- 2.5
+        % Limit angular joint velocity
         for k = 1:length(qDot)
             if abs(qDot(k)) > baxterConst.jointVelLimit(k)
                 qDot(k) = sign(qDot(k))*baxterConst.jointVelLimit(k);

@@ -84,4 +84,6 @@ function [key qflag] = kbhit(cmd)
                 error('Unrecognised parameter');
         end
     end
+    
+end
       

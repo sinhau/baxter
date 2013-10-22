@@ -1,4 +1,5 @@
 function calibrateJamboxx(jamboxx)
+% Calibrate the Jamboxx
 
     disp('Move mouthpiece to the left, then press enter...');
     pause;

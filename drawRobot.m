@@ -1,7 +1,7 @@
-%
+% Daws the robot according to forward kinematics from theta
 % drawRobot.m
 %
-% drawRobot(robot)
+% drawRobot(robot,theta)
 %
 % purpose: draws the robot according to forward kinematics from theta
 %

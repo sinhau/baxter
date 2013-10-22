@@ -1,4 +1,5 @@
 function setBaxterConstants
+% Set baxter constants like position vectors, joint types, etc.
 
     x = [1;0;0]; y = [0;1;0]; z = [0;0;1];
 

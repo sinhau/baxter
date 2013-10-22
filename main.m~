@@ -1,5 +1,4 @@
 clear all;close all;clc;
-% This is the main file!
 
 %% Robot Raconteur Connections
 

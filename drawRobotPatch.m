@@ -1,4 +1,5 @@
-%
+% Draws the robot according to forward kinematics defined in robot and theta
+
 % drawRobotPatch.m
 %
 % h_p = drawRobotPatch(robot,theta,...)

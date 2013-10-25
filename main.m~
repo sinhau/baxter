@@ -34,11 +34,10 @@ kbhit('init');
 setBaxterConstants;
 
 while(1)
-    
-    setPose(baxter,1,baxterConst);
       
     % Gather joint information
-    [jointAnglesLeft,~] = getJointAngles(baxter_JointStates);
+    jointAngles = getJointAngles(baxter_JointStates);
+    jointAnglesLeft = ;
     
     % Calculate full jacobian for left arm
     J = jacobian(baxterConst.leftArm,jointAnglesLeft);

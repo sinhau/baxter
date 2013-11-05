@@ -33,9 +33,9 @@ leftJointVel.velocities = [0;0;0;0;0;0;0];
 kbhit('init');
 setBaxterConstants;
 
-while(1)
-    
-    setPose(baxter,1,baxterConst);
+%setPose(baxter,1,baxterConst);
+
+while(1) 
       
     % Gather joint information
     [jointAnglesLeft,~] = getJointAngles(baxter_JointStates);
@@ -75,7 +75,7 @@ while(1)
     % Calculate desired joint angle velocities
     dampCoeff = 0.1;
     if any(deltaPose)
-        qDot = J'*inv(J*J' + dampCoeff^2*eye(6,6))*deltaPose;
+        qDot = J'*pinv(J*J' + dampCoeff^2*eye(6,6))*deltaPose;
         % Limit angular joint velocity
         for k = 1:length(qDot)
             if abs(qDot(k)) > baxterConst.jointVelLimit(k)

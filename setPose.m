@@ -26,7 +26,7 @@ function setPose(baxter,pose,baxterConst)
     err = ones(7,1);
     errTol = 0.08*ones(7,1);
     kP = 1;
-    kD = 0.1;
+    kD = 0.5;
     switch pose
         case 1
             while any(err > errTol)

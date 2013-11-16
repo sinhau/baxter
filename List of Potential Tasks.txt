@@ -1,0 +1,37 @@
+Pick/Place task in increasing order of difficulty:
+
+1. Retrieving items from shelf
+	a. Objects with flat surfaces
+		i. slim items, like dinner boxes, books, mail
+		ii. broader containers, like cereal boxes, snack boxes
+	b. Objects with circular surfaces
+		i. bottles, soda can, canned food
+	b. Objects with irregular surfaces
+		i. bag of chips, bag of groceries
+
+
+2. Retrieving items from the floor
+	a. Objects with flat surfaces
+		i. picking up mail
+	b. Irregular surfaces
+		i. keys
+		ii. jacket/sweatshirt
+
+
+3. Open/Close Microwave/Refrigerator/Doors
+	
+
+4. Performing tasks with objects in grasp (closed feedback to safely maintain grasp??)
+	a. pouring drinks/cereal 
+	b. put items and retrieve them from microwave/fridge
+	c. putting/removing blankets from the bed
+
+5. Other tasks not requiring grasp
+	a. Turn switches on/off
+	b. opening drawers, then grabbing cutlery
+
+
+5. (Future goal) Automation
+	a. Locate the object of interested in clustered areas like shelves and fridges
+	b. Autonomously orient the arm and then pick up the object
+	c. Use both hands to grab large objects or to open containers/boxes/bags

@@ -1,5 +1,5 @@
 clear all;close all;clc;
-% This is the main file!
+% This is the main file for keyboard based control of Baxter.
 
 %% Robot Raconteur Connections
 

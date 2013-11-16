@@ -1,4 +1,5 @@
 function button2_Callback(hObject,eventdata)
+% Callback function for button 2
 
 buttonState = get(hObject,'Value');
 

@@ -1,5 +1,5 @@
 function setPose(baxter,pose,baxterConst)
-% Drives Baxter to the desired initial pose (only for left arm)
+% Drives Baxter to the desired initial pose (only for left arm for now)
 % Pose 1: Joint angles are [-0.6147;-0.6220;0.0736;1.9800;0.2428;-1.4596;-0.0859]
 % Pose 2: Joint angles are [-0.6197;-1.1735;0.0617;2.0011;-0.0035;0.7152;-0.0280]
 

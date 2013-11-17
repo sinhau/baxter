@@ -8,7 +8,7 @@ function setBaxterConstants
     % - Zero configuration is when the joint_states.position reads 0 for all
     %   joints.
     % - Y-axis is in the direction the arm is stretched
-    %   out inzero configuration, Z-axis points straight up
+    %   out in zero configuration, Z-axis points straight up
 
     
     % Setting up left arm parameters

@@ -1,4 +1,6 @@
 function [linVel_L,linVel_R,wristVel_L,wristVel_R,grip_L,grip_R] = setDesiredInput(jamboxx)
+% Sets desired linear velocity, wrist joint velocities, and grip positions
+% using jamboxx
 
     x = jamboxx.X;
     air = jamboxx.Air;

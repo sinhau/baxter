@@ -32,13 +32,13 @@ function drawRobot(robot,theta)
         sub_robot.H = H(:,1:i);
         sub_robot.P = P(:,1:i);
         sub_robot.n = i;
-        [R,p] =FwdKin(sub_robot,theta(1:i));
+        [R,p] =fwdKin(sub_robot,theta(1:i));
         p_all(:,i+1) = p;
         h_all(:,i) = R*H(:,i);
     end
     
     if size(P,2) > n
-        [~,p] = FwdKin(robot,theta);
+        [~,p] = fwdKin(robot,theta);
         p_all(:,n+2) = p;
     end
     

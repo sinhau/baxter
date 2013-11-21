@@ -1,14 +1,14 @@
 clear all;close all;clc;
-% This is the main file for GUI based control of Baxter.
+% This is the main file for Jamboxx based control of Baxter.
 
 %% Robot Raconteur Connections
 
-% Add callback function path
-addpath('./callbackFuncs');
-
-% Connect to ROS Bridge for Baxter.
+% Baxter connections
 baxter = RobotRaconteur.Connect('tcp://localhost:34572/{0}/ROSBridge');
 jointStateServer = RobotRaconteur.Connect('tcp://localhost:4682/BaxterJointStatesServer/Baxter');
+
+% Jamboxx connection
+jamboxx = RobotRaconteur.Connect('tcp://192.168.1.117:5318/{0}/Jamboxx');
 
 % Set up joint velocity publisher
     % Left arm
@@ -91,80 +91,6 @@ rightMode.mode = uint8(2);
         'force',single(100),'velocity',single(20),...
         'holding',single(100),'deadZone',single(3));
     
-
-%% GUI
-
-% set(handles.pushbutton1,'string','...')
-
-panel = figure('Visible','off','position',[50 500 1000 500]);
-
-% Buttons for left arm
-button1 = uicontrol('Style','togglebutton','position',[350 450 75 25],...
-    'callback',@button1_Callback,'String','Forward');
-button2 = uicontrol('Style','togglebutton','position',[350 415 75 25],...
-    'callback',@button2_Callback,'String','Backward');
-button3 = uicontrol('Style','togglebutton','position',[250 415 75 25],...
-    'callback',@button3_Callback,'String','Left');
-button4 = uicontrol('Style','togglebutton','position',[450 415 75 25],...
-    'callback',@button4_Callback,'String','Right');
-button5 = uicontrol('Style','togglebutton','position',[550 450 75 25],...
-    'callback',@button5_Callback,'String','Up');
-button6 = uicontrol('Style','togglebutton','position',[550 415 75 25],...
-    'callback',@button6_Callback,'String','Down');
-button7 = uicontrol('Style','togglebutton','position',[250 350 75 25],...
-    'callback',@button7_Callback,'String','W0+');
-button8 = uicontrol('Style','togglebutton','position',[250 315 75 25],...
-    'callback',@button8_Callback,'String','W0-');
-button9 = uicontrol('Style','togglebutton','position',[350 350 75 25],...
-    'callback',@button9_Callback,'String','W1+');
-button10 = uicontrol('Style','togglebutton','position',[350 315 75 25],...
-    'callback',@button10_Callback,'String','W1-');
-button11 = uicontrol('Style','togglebutton','position',[450 350 75 25],...
-    'callback',@button11_Callback,'String','W2+');
-button12 = uicontrol('Style','togglebutton','position',[450 315 75 25],...
-    'callback',@button12_Callback,'String','W2-');
-button13 = uicontrol('Style','togglebutton','position',[550 350 75 25],...
-    'callback',@button13_Callback,'String','Grip Open');
-button14 = uicontrol('Style','togglebutton','position',[550 315 75 25],...
-    'callback',@button14_Callback,'String','Grip Close');
-text1 = uicontrol('Style','text','position',[50 480 800 20],...
-    'String','LEFT ARM');
-
-% Buttons for right arm
-button1_R = uicontrol('Style','togglebutton','position',[350 150 75 25],...
-    'callback',@button1_R_Callback,'String','Forward');
-button2_R = uicontrol('Style','togglebutton','position',[350 115 75 25],...
-    'callback',@button2_R_Callback,'String','Backward');
-button3_R = uicontrol('Style','togglebutton','position',[250 115 75 25],...
-    'callback',@button3_R_Callback,'String','Left');
-button4_R = uicontrol('Style','togglebutton','position',[450 115 75 25],...
-    'callback',@button4_R_Callback,'String','Right');
-button5_R = uicontrol('Style','togglebutton','position',[550 150 75 25],...
-    'callback',@button5_R_Callback,'String','Up');
-button6_R = uicontrol('Style','togglebutton','position',[550 115 75 25],...
-    'callback',@button6_R_Callback,'String','Down');
-button7_R = uicontrol('Style','togglebutton','position',[250 50 75 25],...
-    'callback',@button7_R_Callback,'String','W0+');
-button8_R = uicontrol('Style','togglebutton','position',[250 15 75 25],...
-    'callback',@button8_R_Callback,'String','W0-');
-button9_R = uicontrol('Style','togglebutton','position',[350 50 75 25],...
-    'callback',@button9_R_Callback,'String','W1+');
-button10_R = uicontrol('Style','togglebutton','position',[350 15 75 25],...
-    'callback',@button10_R_Callback,'String','W1-');
-button11_R = uicontrol('Style','togglebutton','position',[450 50 75 25],...
-    'callback',@button11_R_Callback,'String','W2+');
-button12_R = uicontrol('Style','togglebutton','position',[450 15 75 25],...
-    'callback',@button12_R_Callback,'String','W2-');
-button13_R = uicontrol('Style','togglebutton','position',[550 50 75 25],...
-    'callback',@button13_R_Callback,'String','Grip Open');
-button14_R = uicontrol('Style','togglebutton','position',[550 15 75 25],...
-    'callback',@button14_R_Callback,'String','Grip Close');
-text2 = uicontrol('Style','text','position',[50 200 800 20],...
-    'String','RIGHT ARM');
-
-stop = uicontrol('Style','pushbutton','position',[900 50 50 400],...
-    'String','EXIT','callback',@stop_Callback);
-
 %% Main
 
 setBaxterConstants;
@@ -187,7 +113,6 @@ publisher_rightGripCal.publish([]);
 pause(3);
 
 clc; disp('READY TO MOVE');
-set(panel,'Visible','on');
 while(1) 
     
     if stopProg
@@ -202,6 +127,9 @@ while(1)
     jointAngles = jointStateServer.JointPositions;
     jointAnglesLeft = jointAngles(1:7);
     jointAnglesRight = jointAngles(8:14);
+    
+    % Set desired input using Jamboxx
+    [linVel_L,linVel_R,wristVel_L,wristVel_R,grip_L,grip_R] = setDesiredInput(jamboxx);
     
     % Calculate full jacobian for both arms
     leftJ = jacobian(baxterConst.leftArm,jointAnglesLeft);

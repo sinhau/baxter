@@ -10,6 +10,9 @@ jointStateServer = RobotRaconteur.Connect('tcp://localhost:4682/BaxterJointState
 % Jamboxx connection
 jamboxx = RobotRaconteur.Connect('tcp://192.168.1.117:5318/{0}/Jamboxx');
 
+% Xbox 360 controller connection
+xbox = RobotRaconteur.Connect('tcp://192.168.1.117:5437/Xbox_controllerServer/xbox_controller');
+
 % Set up joint velocity publisher
     % Left arm
     handle_leftJointVel = baxter.publish(...

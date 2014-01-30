@@ -7,90 +7,7 @@ clear all;close all;clc;
 addpath('./callbackFuncs');
 
 % Connect to ROS Bridge for Baxter.
-baxter = RobotRaconteur.Connect('tcp://localhost:34572/{0}/ROSBridge');
-jointStateServer = RobotRaconteur.Connect('tcp://localhost:4682/BaxterJointStatesServer/Baxter');
-
-% Set up joint velocity publisher
-    % Left arm
-    handle_leftJointVel = baxter.publish(...
-        '/robot/limb/left/command_joint_velocities',...
-        'baxter_msgs/JointVelocities');
-    publisher_leftJointVel = baxter.get_publishers(handle_leftJointVel);
-    % Right arm
-    handle_rightJointVel = baxter.publish(...
-    '/robot/limb/right/command_joint_velocities',...
-    'baxter_msgs/JointVelocities');
-    publisher_rightJointVel = baxter.get_publishers(handle_rightJointVel);
-
-% Set up joint command mode publisher
-    % Left arm
-    handle_leftMode = baxter.publish(...
-        '/robot/limb/left/joint_command_mode',...
-        'baxter_msgs/JointCommandMode');
-    publisher_leftMode = baxter.get_publishers(handle_leftMode);
-    % Right arm
-    handle_rightMode = baxter.publish(...
-    '/robot/limb/right/joint_command_mode',...
-    'baxter_msgs/JointCommandMode');
-    publisher_rightMode = baxter.get_publishers(handle_rightMode);
-
-% Set up gripper control
-    % Left arm
-    handle_leftGrip = baxter.publish(...
-        '/sdk/robot/limb/left/accessory/gripper/command_set',...
-        'baxter_msgs/GripperCommand');
-    publisher_leftGrip = baxter.get_publishers(handle_leftGrip);
-    handle_leftGripCal = baxter.publish(...
-        '/robot/limb/left/accessory/gripper/command_calibrate',...
-        'std_msgs/Empty');
-    publisher_leftGripCal = baxter.get_publishers(handle_leftGripCal);
-    % Right arm
-    handle_rightGrip = baxter.publish(...
-        '/sdk/robot/limb/right/accessory/gripper/command_set',...
-        'baxter_msgs/GripperCommand');
-    publisher_rightGrip = baxter.get_publishers(handle_rightGrip);
-    handle_rightGripCal = baxter.publish(...
-        '/robot/limb/right/accessory/gripper/command_calibrate',...
-        'std_msgs/Empty');
-    publisher_rightGripCal = baxter.get_publishers(handle_rightGripCal);
-    
-
-% Set up joint states subscriber
-handle_jointStates = baxter.subscribe('/robot/joint_states',...
-    'sensor_msgs/JointState');
-subscriber_jointStates = baxter.get_subscribers(handle_jointStates);
-baxter_JointStates = subscriber_jointStates.subscriberwire.Connect();
-
-%% Message type setup
-
-% baxter_msgs/JointCommandMode
-leftMode.mode = uint8(2);   % 1 for position mode; 2 is for velocity mode; 3 for torque mode
-rightMode.mode = uint8(2);
-
-% baxter_msgs/JointVelocities
-    % Left arm
-    leftJointVel.names = {{int32(0),'left_e0'};{int32(1),'left_e1'};...
-        {int32(2),'left_s0'};{int32(3),'left_s1'};...
-        {int32(4),'left_w0'};{int32(5),'left_w1'};...
-        {int32(6),'left_w2'}};
-    leftJointVel.velocities = [0;0;0;0;0;0;0];
-    % Right arm
-    rightJointVel.names = {{int32(0),'right_e0'};{int32(1),'right_e1'};...
-        {int32(2),'right_s0'};{int32(3),'right_s1'};...
-        {int32(4),'right_w0'};{int32(5),'right_w1'};...
-        {int32(6),'right_w2'}};
-    rightJointVel.velocities = [0;0;0;0;0;0;0];
-
-% baxter_msgs/GripperCommand
-    % Left gripper
-    leftGrip = struct('position',single(100),...
-        'force',single(100),'velocity',single(20),...
-        'holding',single(100),'deadZone',single(3));
-    % Right gripper
-    rightGrip = struct('position',single(100),...
-        'force',single(100),'velocity',single(20),...
-        'holding',single(100),'deadZone',single(3));
-    
+baxter = RobotRaconteur.Connect('tcp://localhost:4682/BaxterServer/Baxter');
 
 %% GUI
 
@@ -158,14 +75,15 @@ button12_R = uicontrol('Style','togglebutton','position',[450 15 75 25],...
 button13_R = uicontrol('Style','togglebutton','position',[550 50 75 25],...
     'callback',@button13_R_Callback,'String','Grip Open');
 button14_R = uicontrol('Style','togglebutton','position',[550 15 75 25],...
-    'callback',@button14_R_Callback,'String','Grip Close');
+    'callbac
+k',@button14_R_Callback,'String','Grip Close');
 text2 = uicontrol('Style','text','position',[50 200 800 20],...
     'String','RIGHT ARM');
 
 stop = uicontrol('Style','pushbutton','position',[900 50 50 400],...
     'String','EXIT','callback',@stop_Callback);
 
-%% Main
+%% Main2_Callback,'String','Backward');
 
 setBaxterConstants;
 stopProg = 0;
@@ -175,7 +93,8 @@ linVel_L = [0;0;0];
 angVel_L = [0;0;0];
 wristVel_L = [];
 grip_L = [];
-publisher_leftGripCal.publish([]);
+baxter.Gripp
+erCalibrate('left');
 pause(3);
 
 % Initialize right arm params
@@ -183,8 +102,8 @@ linVel_R = [0;0;0];
 angVel_R = [0;0;0];
 wristVel_R = [];
 grip_R = [];
-publisher_rightGripCal.publish([]);
-pause(3);
+% publisher_rightGripCal.publish([]);
+% pause(3);
 
 clc; disp('READY TO MOVE');
 set(panel,'Visible','on');
@@ -199,7 +118,7 @@ while(1)
     
     % Gather joint information
     pause(0.01);
-    jointAngles = jointStateServer.JointPositions;
+    jointAngles = baxter.JointPositions;
     jointAnglesLeft = jointAngles(1:7);
     jointAnglesRight = jointAngles(8:14);
     
@@ -247,35 +166,33 @@ while(1)
 
     % Publish desired joint velocities
         % Left arm
-        leftJointVel.velocities = [qDot_L(3);qDot_L(4);...
-            qDot_L(1);qDot_L(2);qDot_L(5);...
+        leftJointVel = [qDot_L(1);qDot_L(2);...
+            qDot_L(3);qDot_L(4);qDot_L(5);...
             qDot_L(6);qDot_L(7)];
         if ~isempty(wristVel_L)
-            leftJointVel.velocities(5:7) = wristVel_L;
+            leftJointVel(5:7) = wristVel_L;
         end
-        publisher_leftMode.publish(leftMode);
-        publisher_leftJointVel.publish(leftJointVel);
+        baxter.setJointVelocity('left',leftJointVel);
         %Right arm
-        rightJointVel.velocities = [qDot_R(3);qDot_R(4);...
-            qDot_R(1);qDot_R(2);qDot_R(5);...
-            qDot_R(6);qDot_R(7)];
-        if ~isempty(wristVel_R)
-            rightJointVel.velocities(5:7) = wristVel_R;
-        end
-        publisher_rightMode.publish(rightMode);
-        publisher_rightJointVel.publish(rightJointVel);
+%         rightJointVel.velocities = [qDot_R(3);qDot_R(4);...
+%             qDot_R(1);qDot_R(2);qDot_R(5);...
+%             qDot_R(6);qDot_R(7)];
+%         if ~isempty(wristVel_R)
+%             rightJointVel.velocities(5:7) = wristVel_R;
+%         end
+%         publisher_rightMode.publish(rightMode);
+%         publisher_rightJointVel.publish(rightJointVel);
     
     % Publish grip position
         % Left gripper
         if ~isempty(grip_L)
-            leftGrip.position = grip_L;
-            publisher_leftGrip.publish(leftGrip);
+            baxter.setGripperPosition('left',double(grip_L));
         end
         %Right gripper
-        if ~isempty(grip_R)
-            rightGrip.position = grip_R;
-            publisher_rightGrip.publish(rightGrip);
-        end
+%         if ~isempty(grip_R)
+%             rightGrip.position = grip_R;
+%             publisher_rightGrip.publish(rightGrip);
+%         end
     
 end
 clc; msgbox('Program stopped!');

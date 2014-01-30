@@ -1,7 +1,7 @@
 %% Connect to XBox RR Service
 try
   %'tcp://host:port/NodeName/RegisteredObjectName'
-  xbox = RobotRaconteur.Connect('tcp://localhost:5437/Xbox_controllerServer/xbox_controller');
+  xbox = RobotRaconteur.Connect('tcp://192.168.1.104:5437/Xbox_controllerServer/xbox_controller');
   xboxIsConnected=1;
 catch ME
   disp(ME.message);
@@ -9,7 +9,7 @@ catch ME
 end
 
 %% Initialize Serial Communication
-s1 = serial('com62');    % define serial port
+s1 = serial('/dev/ttyS106');    % define serial port
 set(s1, 'DataBits', 8);
 set(s1, 'StopBits', 1);
 s1.BaudRate=9600;               % define baud rate

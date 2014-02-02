@@ -10,19 +10,16 @@ baxter = RobotRaconteur.Connect('tcp://localhost:4682/BaxterServer/Baxter');
 jamboxx = RobotRaconteur.Connect('tcp://192.168.1.104:5318/{0}/Jamboxx');
 
 % Xbox 360 controller connection
-try
-  xbox = RobotRaconteur.Connect('tcp://192.168.1.104:5437/Xbox_controllerServer/xbox_controller');
-  xboxIsConnected=1;
-catch ME
-  disp(ME.message);
-  disp('XBox RobotRaconteur service was not running.');
-end
+xbox = RobotRaconteur.Connect('tcp://192.168.1.104:5437/Xbox_controllerServer/xbox_controller');
+
+% Arduino connection
 o = RobotRaconteur.Connect('tcp://localhost:5001/{0}/Arduino');
 
 %% Main
 
 setBaxterConstants;
 stopProg = 0;
+kbhit('init');
 
 % Initialize left arm params
 linVel_L = [0;0;0];
@@ -40,10 +37,11 @@ grip_R = [];
 % publisher_rightGripCal.publish([]);
 % pause(3);
 
-clc; disp('READY TO MOVE');
+clc; disp('READY TO MOVE...PRESS Q TO QUIT');
 while(1) 
-
-    if stopProg
+    
+    stopProg = kbhit;
+    if stopProg == 'Q'
         close all;
         break;
     end

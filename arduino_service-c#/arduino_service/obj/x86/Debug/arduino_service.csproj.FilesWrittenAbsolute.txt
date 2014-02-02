@@ -1,0 +1,4 @@
+/home/baxter-laptop/baxter/arduino_service-c#/arduino_service/bin/Debug/arduino_service.exe
+/home/baxter-laptop/baxter/arduino_service-c#/arduino_service/obj/x86/Debug/arduino_service.exe
+/home/baxter-laptop/baxter/arduino_service-c#/arduino_service/bin/Debug/arduino_service.exe.mdb
+/home/baxter-laptop/baxter/arduino_service-c#/arduino_service/obj/x86/Debug/arduino_service.exe.mdb

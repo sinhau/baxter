@@ -11,7 +11,7 @@ object arduino_obj
 end object
 """
 print('Starting server');
-ser = serial.Serial('/dev/ttyACM1', 9600, timeout=.1)
+ser = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
 
 
 commandByte = [0];

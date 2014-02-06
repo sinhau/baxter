@@ -50,8 +50,8 @@ while(1)
     xBoxInput = xbox.controller_input;
     xInput = (xBoxInput.left_thumbstick_X)/130;
     yInput = (xBoxInput.left_thumbstick_Y )/130;
-    disp(xInput);
-    disp(yInput);
+%     disp(xInput);
+%     disp(yInput);
     o.arduino(int8(-1), int8(xInput));
     o.arduino(int8(1), int8(yInput));
  

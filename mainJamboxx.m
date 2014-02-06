@@ -37,15 +37,17 @@ grip_R = [];
 % pause(3);
 
 x = tic;
-y = toc(x);
+y = 0;
 while y < 5
     baxter.setJointPosition('left',[-0.8544;-0.8805;0.1511;1.9934;-0.0418;-1.1789;-0.1457]);
     baxter.setJointPosition('right',[0.6105;-1.0761;0.1806;2.2415;-0.0065;-1.1340;-1.7675]);
     y = toc(x);
 end
 
+calibrateJamboxx(jamboxx);
+
 clc; disp('READY TO MOVE...');
-x = tic;
+
 while(1) 
     
 %     % Arduino
@@ -85,44 +87,41 @@ while(1)
     % Calculate desired joint angle velocities
         % Left arm
         dampCoeff_L = 0.1;
-        if any(allVel_L)
+        if any(allVel_L) || any(wristVel_L)
             qDot_L = leftJ'*pinv(leftJ*leftJ' + dampCoeff_L^2*eye(6,6))*allVel_L; %Damped least squares
             % Limit joint velocity
             for k = 1:length(qDot_L)
                 if abs(qDot_L(k)) > baxterConst.jointVelLimit(k)
                     qDot_L(k) = sign(qDot_L(k))*baxterConst.jointVelLimit(k);
                 end
-            end     
+            end   
+            if ~isempty(wristVel_L)
+                qDot_L(5:7) = wristVel_L;
+            end
+            newJointAnglesLeft = jointAnglesLeft + qDot_L*0.1;
+            baxter.setJointPosition('left',newJointAnglesLeft);
         else
             qDot_L = [0;0;0;0;0;0;0];
         end
         % Right arm
         dampCoeff_R = 0.1;
-        if any(allVel_R)
+        if any(allVel_R)  || any(wristVel_R)
             qDot_R = rightJ'*pinv(rightJ*rightJ' + dampCoeff_R^2*eye(6,6))*allVel_R; %Damped least squares
             % Limit joint velocity
             for k = 1:length(qDot_R)
                 if abs(qDot_R(k)) > baxterConst.jointVelLimit(k)
                     qDot_R(k) = sign(qDot_R(k))*baxterConst.jointVelLimit(k);
                 end
-            end     
+            end  
+            if ~isempty(wristVel_R)
+                qDot_R(5:7) = wristVel_R;
+            end
+            newJointAnglesRight = jointAnglesRight + qDot_R*0.1;
+            baxter.setJointPosition('right',newJointAnglesRight);
         else
-
             qDot_R = [0;0;0;0;0;0;0];
         end
         
-    % Publish desired joint velocities
-        % Left arm
-        if ~isempty(wristVel_L)
-            qDot_L(5:7) = wristVel_L;
-        end
-        baxter.setJointVelocity('left',qDot_L);
-        %Right arm
-        if ~isempty(wristVel_R)
-            qDot_R(5:7) = wristVel_R;
-        end
-        baxter.setJointVelocity('right',qDot_R);
-    
     % Publish grip position
         % Left gripper
         if ~isempty(grip_L)
@@ -132,6 +131,5 @@ while(1)
         if ~isempty(grip_R)
             baxter.setGripperPosition('right',double(grip_R));
         end
-        toc(x)
 end
 clc; msgbox('Program stopped!');

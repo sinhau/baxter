@@ -26,7 +26,7 @@ angVel_L = [0;0;0];
 wristVel_L = [];
 grip_L = [];
 baxter.GripperCalibrate('left');
-pause(3);
+pause(2);
 
 % Initialize right arm params
 linVel_R = [0;0;0];
@@ -35,6 +35,14 @@ wristVel_R = [];
 grip_R = [];
 % publisher_rightGripCal.publish([]);
 % pause(3);
+
+x = tic;
+y = toc(x);
+while y < 5
+    baxter.setJointPosition('left',[-0.8544;-0.8805;0.1511;1.9934;-0.0418;-1.1789;-0.1457]);
+    baxter.setJointPosition('right',[0.6105;-1.0761;0.1806;2.2415;-0.0065;-1.1340;-1.7675]);
+    y = toc(x);
+end
 
 clc; disp('READY TO MOVE...');
 while(1) 

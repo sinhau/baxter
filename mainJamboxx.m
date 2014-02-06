@@ -45,6 +45,7 @@ while y < 5
 end
 
 clc; disp('READY TO MOVE...');
+x = tic;
 while(1) 
     
 %     % Arduino
@@ -109,7 +110,7 @@ while(1)
 
             qDot_R = [0;0;0;0;0;0;0];
         end
-
+        
     % Publish desired joint velocities
         % Left arm
         if ~isempty(wristVel_L)
@@ -131,6 +132,6 @@ while(1)
         if ~isempty(grip_R)
             baxter.setGripperPosition('right',double(grip_R));
         end
-    
+        toc(x)
 end
 clc; msgbox('Program stopped!');

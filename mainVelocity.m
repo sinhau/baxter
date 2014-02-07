@@ -44,7 +44,7 @@ while y < 5
     y = toc(x);
 end
 
-calibrateJamboxx(jamboxx);
+%calibrateJamboxx(jamboxx);
 
 clc; disp('READY TO MOVE...');
 
@@ -60,12 +60,9 @@ while(1)
 %     o.arduino(int8(1), int8(yInput));
  
     % Gather joint information
-    %pause(0.01);
     jointAngles = baxter.JointPositions;
     jointAnglesLeft = jointAngles(1:7);
     jointAnglesRight = jointAngles(8:14);
-    %baxter.setJointPosition('left',jointAnglesLeft); 
-    %baxter.setJointPosition('right',jointAnglesRight);
     
     % Set desired input using Jamboxx
     [linVel_L,linVel_R,wristVel_L,wristVel_R,grip_L,grip_R] = setDesiredInput(jamboxx);
@@ -89,37 +86,37 @@ while(1)
         dampCoeff_L = 0.1;
         if any(allVel_L) || any(wristVel_L)
             qDot_L = leftJ'*pinv(leftJ*leftJ' + dampCoeff_L^2*eye(6,6))*allVel_L; %Damped least squares
+            if ~isempty(wristVel_L)
+                qDot_L(5:7) = wristVel_L;
+            end
             % Limit joint velocity
             for k = 1:length(qDot_L)
                 if abs(qDot_L(k)) > baxterConst.jointVelLimit(k)
                     qDot_L(k) = sign(qDot_L(k))*baxterConst.jointVelLimit(k);
                 end
             end   
-            if ~isempty(wristVel_L)
-                qDot_L(5:7) = wristVel_L;
-            end
-            newJointAnglesLeft = jointAnglesLeft + qDot_L*0.05;
-            baxter.setJointPosition('left',newJointAnglesLeft);
+            baxter.setJointVelocity('left',qDot_L);
         else
             qDot_L = [0;0;0;0;0;0;0];
+            baxter.setJointVelocity('left',qDot_L);
         end
         % Right arm
         dampCoeff_R = 0.1;
         if any(allVel_R)  || any(wristVel_R)
             qDot_R = rightJ'*pinv(rightJ*rightJ' + dampCoeff_R^2*eye(6,6))*allVel_R; %Damped least squares
+            if ~isempty(wristVel_R)
+                qDot_R(5:7) = wristVel_R;
+            end
             % Limit joint velocity
             for k = 1:length(qDot_R)
                 if abs(qDot_R(k)) > baxterConst.jointVelLimit(k)
                     qDot_R(k) = sign(qDot_R(k))*baxterConst.jointVelLimit(k);
                 end
             end  
-            if ~isempty(wristVel_R)
-                qDot_R(5:7) = wristVel_R;
-            end
-            newJointAnglesRight = jointAnglesRight + qDot_R*0.05;
-            baxter.setJointPosition('right',newJointAnglesRight);
+            baxter.setJointVelocity('right',qDot_R);
         else
             qDot_R = [0;0;0;0;0;0;0];
+            baxter.setJointVelocity('right',qDot_R);
         end
         
     % Publish grip position

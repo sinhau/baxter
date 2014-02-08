@@ -38,7 +38,6 @@ class arduino_impl(object):
 #Create and register a transport
 t=RR.TcpTransport()
 t.StartServer(5002)
-t.DefaultReceiveTimeout = 1
 RR.RobotRaconteurNode.s.RegisterTransport(t)
 
 

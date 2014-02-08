@@ -8,11 +8,7 @@ baxter = RobotRaconteur.Connect('tcp://localhost:4682/BaxterServer/Baxter');
 % Jamboxx connection
 jamboxx = RobotRaconteur.Connect('tcp://192.168.1.104:5318/{0}/Jamboxx');
 
-% Xbox 360 controller connection
-xbox = RobotRaconteur.Connect('tcp://192.168.1.104:5437/Xbox_controllerServer/xbox_controller');
 
-% Arduino connection
-%o = RobotRaconteur.Connect('tcp://localhost:5001/{0}/Arduino');
 
 
 %% File
@@ -65,14 +61,7 @@ while(1)
     
     m.Data(1) = 0;
     
-%     % Arduino
-%     xBoxInput = xbox.controller_input;
-%     xInput = (xBoxInput.left_thumbstick_X)/130;
-%     yInput = (xBoxInput.left_thumbstick_Y )/130;
-% %     disp(xInput);
-% %     disp(yInput);
-%     o.arduino(int8(-1), int8(xInput));
-%     o.arduino(int8(1), int8(yInput));
+
  
     % Gather joint information
     jointAngles = baxter.JointPositions;

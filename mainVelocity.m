@@ -1,4 +1,3 @@
-clear all;close all;clc;
 % This is the main file for Jamboxx based control of Baxter.
 
 %% Robot Raconteur Connections
@@ -15,13 +14,27 @@ xbox = RobotRaconteur.Connect('tcp://192.168.1.104:5437/Xbox_controllerServer/xb
 % Arduino connection
 %o = RobotRaconteur.Connect('tcp://localhost:5001/{0}/Arduino');
 
+
+%% File
+
+filename = fullfile('baxterData.dat');
+if ~exist(filename,'file')
+    [f,msg] = fopen(filename,'wb');
+    if f ~= -1
+        fwrite(f,[0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0],'double');
+        fclose(f);
+    else
+        error('Cannot open file "%s": %s.',filename,msg);
+    end
+end
+m = memmapfile(filename,'Writable',true,'Format','double');
+
 %% Main
 
 setBaxterConstants;
 
 % Initialize left arm params
 linVel_L = [0;0;0];
-
 angVel_L = [0;0;0];
 wristVel_L = [];
 grip_L = [];
@@ -33,9 +46,10 @@ linVel_R = [0;0;0];
 angVel_R = [0;0;0];
 wristVel_R = [];
 grip_R = [];
-% publisher_rightGripCal.publish([]);
-% pause(3);
+baxter.GripperCalibrate('right');
+pause(2);
 
+% Starting pose
 x = tic;
 y = 0;
 while y < 5
@@ -45,10 +59,11 @@ while y < 5
 end
 
 %calibrateJamboxx(jamboxx);
-
 clc; disp('READY TO MOVE...');
 
 while(1) 
+    
+    m.Data(1) = 0;
     
 %     % Arduino
 %     xBoxInput = xbox.controller_input;
@@ -95,10 +110,10 @@ while(1)
                     qDot_L(k) = sign(qDot_L(k))*baxterConst.jointVelLimit(k);
                 end
             end   
-            baxter.setJointVelocity('left',qDot_L);
+            m.Data(2:8) = qDot_L;
         else
             qDot_L = [0;0;0;0;0;0;0];
-            baxter.setJointVelocity('left',qDot_L);
+            m.Data(2:8) = qDot_L;
         end
         % Right arm
         dampCoeff_R = 0.1;
@@ -113,20 +128,20 @@ while(1)
                     qDot_R(k) = sign(qDot_R(k))*baxterConst.jointVelLimit(k);
                 end
             end  
-            baxter.setJointVelocity('right',qDot_R);
+            m.Data(9:15) = qDot_R;
         else
             qDot_R = [0;0;0;0;0;0;0];
-            baxter.setJointVelocity('right',qDot_R);
+            m.Data(9:15) = qDot_R;
         end
         
     % Publish grip position
         % Left gripper
         if ~isempty(grip_L)
-            baxter.setGripperPosition('left',double(grip_L));
+            m.Data(16) = grip_L;
         end
         %Right gripper
         if ~isempty(grip_R)
-            baxter.setGripperPosition('right',double(grip_R));
+            m.Data(17) = grip_R;
         end
 end
 clc; msgbox('Program stopped!');

@@ -1,9 +1,0 @@
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service\arduino_service\obj\x86\Debug\ResolveAssemblyReference.cache
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service\arduino_service\bin\Debug\arduino_service.exe
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service\arduino_service\bin\Debug\arduino_service.pdb
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service\arduino_service\bin\Debug\RobotRaconteurNet.dll
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service\arduino_service\obj\x86\Debug\arduino_service.exe
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service\arduino_service\obj\x86\Debug\arduino_service.pdb
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service - further reduced\arduino_service\obj\x86\Debug\arduino_service.exe
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service - further reduced\arduino_service\obj\x86\Debug\arduino_service.pdb
-C:\Users\cunnia3\Documents\MATLAB\chair control\arduino_service - further reduced\arduino_service\obj\x86\Debug\ResolveAssemblyReference.cache

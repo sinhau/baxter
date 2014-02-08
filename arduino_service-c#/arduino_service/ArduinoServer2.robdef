@@ -1,6 +1,0 @@
-service arduino2_interface
-
-
-object arduino2
-	function void setPotentiometer(int32 motor, int32 speed)  
-end object

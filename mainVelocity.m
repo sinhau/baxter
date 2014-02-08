@@ -143,5 +143,7 @@ while(1)
         if ~isempty(grip_R)
             m.Data(17) = grip_R;
         end
+        m.Data(1) = 1;
+        pause(0.1);
 end
 clc; msgbox('Program stopped!');

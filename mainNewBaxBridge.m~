@@ -4,14 +4,14 @@
 
 % Baxter joint connections
 try
-    baxterJ = RobotRaconteur.Connect('tcp://localhost:4664/BaxterJointServer/Baxter');
+    baxterJ = RobotRaconteur.Connect('tcp://localhost:4662/BaxterJointServer/Baxter');
 catch err
     disp(['CANNOT CONNECT TO BAXTER JOINT SERVER:',err.message]);
 end
 
 % Baxter peripherals connections
 try
-    baxterP = RobotRaconteur.Connect('tcp://localhost:4665/BaxterPeripheralServer/BaxterPeripherals');
+    baxterP = RobotRaconteur.Connect('tcp://localhost:4663/BaxterPeripheralServer/BaxterPeripherals');
 catch err
     disp(['CANNOT CONNECT TO BAXTER PERIPHERALS SERVER:',err.message]);
 end

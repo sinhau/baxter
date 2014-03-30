@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Starting all MATLAB scripts (setVelocity,mainVelocity,chaircontrol_Matlab $1"
-x-terminal-emulator -e /usr/local/MATLAB/R2013a/bin/matlab -nojvm -nodesktop -r "setVelocity"
-x-terminal-emulator -e /usr/local/MATLAB/R2013a/bin/matlab -nojvm -nodesktop -r "mainVelocity"
-x-terminal-emulator -e /usr/local/MATLAB/R2013a/bin/matlab -nojvm -nodesktop -r "chaircontrol_Matlab"
+echo "Opening MATLAB scripts"
+x-terminal-emulator -e /usr/local/MATLAB/R2013a/bin/matlab -nojvm -nodesktop -r "$1"
+x-terminal-emulator -e /usr/local/MATLAB/R2013a/bin/matlab -nojvm -nodesktop -r "$2"
+x-terminal-emulator -e /usr/local/MATLAB/R2013a/bin/matlab -nojvm -nodesktop -r "$3"

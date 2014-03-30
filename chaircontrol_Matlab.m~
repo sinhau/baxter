@@ -9,14 +9,14 @@ catch ME
 end
 
 try
-    baxter = RobotRaconteur.Connect('tcp://localhost:4654/BaxterJointServer/Baxter');
+    baxter = RobotRaconteur.Connect('tcp://localhost:4693/BaxterJointServer/Baxter');
 catch ME
     disp(ME.message);
     error('Cannot connect to Baxter.');
 end
 
 %% Initialize Serial Communicatio[-0.8544;-0.8805;0.1511;1.9934;-0.0418;-1.1789;-0.1457]n
-s1 = serial('/dev/ttyS111');    % define serial port
+s1 = serial('/dev/ttyS103');    % define serial port
 set(s1, 'DataBits', 8);
 set(s1, 'StopBits', 1);
 s1.BaudRate=9600;               % define baud rate
@@ -61,9 +61,9 @@ while(1)
      disp(xInput);
      disp(yInput);    
      
-     %DAMPING
-     %xInput = 204 + (xInput - 204)/1.5;
-     %yInput = 46 + (yInput - 46)/1.5;
+     %%DAMPING
+     xInput = 204 + (xInput - 204)/2;
+     yInput = 46 + (yInput - 46)/2;
      
      
      fwrite(s1,char(xInput), 'char');

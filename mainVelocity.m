@@ -2,13 +2,21 @@
 
 %% Robot Raconteur Connections
 
-% Baxter connections
-baxter = RobotRaconteur.Connect('tcp://localhost:4682/BaxterServer/Baxter');
+% Baxter joint connections
+try
+    baxter = RobotRaconteur.Connect('tcp://localhost:4698/BaxterServer/Baxter');
+catch ME
+    disp(ME.message);
+    error('Cannot connect to Baxter');
+end
 
 % Jamboxx connection
-jamboxx = RobotRaconteur.Connect('tcp://192.168.1.104:5318/{0}/Jamboxx');
-
-
+try
+    jamboxx = RobotRaconteur.Connect('tcp://192.168.1.103:5318/{0}/Jamboxx');
+catch ME
+    disp(ME.message);
+    error('Cannot connect to Jamboxx');
+end
 
 
 %% File
@@ -49,20 +57,18 @@ pause(2);
 x = tic;
 y = 0;
 while y < 5
-    baxter.setJointPosition('left',[-0.8544;-0.8805;0.1511;1.9934;-0.0418;-1.1789;-0.1457]);
-    baxter.setJointPosition('right',[0.6105;-1.0761;0.1806;2.2415;-0.0065;-1.1340;-1.7675]);
+    baxter.setJointPosition('left',[-0.7854;-1.0472;0;2.0944;0;-1.0472;-0]);
+    baxter.setJointPosition('right',[0.7854;-1.0472;0;2.0944;0;-1.0472;-0]);
     y = toc(x);
 end
 
-%calibrateJamboxx(jamboxx);
+calibrateJamboxx(jamboxx);
 clc; disp('READY TO MOVE...');
 
 while(1) 
     
     m.Data(1) = 0;
-    
-
- 
+     
     % Gather joint information
     jointAngles = baxter.JointPositions;
     jointAnglesLeft = jointAngles(1:7);

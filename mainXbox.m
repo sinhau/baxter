@@ -1,26 +1,28 @@
-% This is the main file for Jamboxx based control of Baxter.
+% This is the main file for Xbox based control of Baxter.
 
 %% Robot Raconteur Connections
 
-% Baxter connections
-baxter = RobotRaconteur.Connect('tcp://localhost:4695/BaxterServer/Baxter');
-
-% xBox connection
-xbox = RobotRaconteur.Connect('tcp://192.168.1.104:5437/Xbox_controllerServer/xbox_controller');
-
-%% File
-
-filename = fullfile('baxterData.dat');
-if ~exist(filename,'file')
-    [f,msg] = fopen(filename,'wb');
-    if f ~= -1
-        fwrite(f,[0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0],'double');
-        fclose(f);
-    else
-        error('Cannot open file "%s": %s.',filename,msg);
-    end
+% Baxter joint connections
+try
+    baxterJ = RobotRaconteur.Connect('tcp://localhost:4676/BaxterJointServer/Baxter');
+catch err
+    disp(['CANNOT CONNECT TO BAXTER JOINT SERVER:',err.message]);
 end
-m = memmapfile(filename,'Writable',true,'Format','double');
+
+% Baxter peripherals connections
+try
+    baxterP = RobotRaconteur.Connect('tcp://localhost:4677/BaxterPeripheralServer/BaxterPeripherals');
+catch err
+    disp(['CANNOT CONNECT TO BAXTER PERIPHERALS SERVER:',err.message]);
+end
+
+% Xbox 360 controller connection
+try
+    xbox = RobotRaconteur.Connect('tcp://192.168.1.103:5437/Xbox_controllerServer/xbox_controller');
+catch err
+    disp(['CANNOT CONNECT TO XBOX SERVER:',err.message]);
+end
+
 
 %% Main
 
@@ -32,7 +34,7 @@ linVel_L = [0;0;0];
 angVel_L = [0;0;0];
 wristVel_L = [];
 grip_L = [];
-baxter.GripperCalibrate('left');
+baxterP.calibrateGripper('left');
 pause(2);
 
 % Initialize right arm params
@@ -40,35 +42,81 @@ linVel_R = [0;0;0];
 angVel_R = [0;0;0];
 wristVel_R = [];
 grip_R = [];
-baxter.GripperCalibrate('right');
+baxterP.calibrateGripper('right');
+pause(2);
+
+% Initialize serial communication
+try
+    s1 = serial('/dev/ttyS106'); % Define serial port
+catch err
+    disp(['CHECK IF SERIAL PORT IS VALID:',err.message]);
+end
+set(s1, 'DataBits', 8);
+set(s1, 'StopBits', 1);
+s1.BaudRate=9600; % Define baud rate
+set(s1, 'Parity', 'none');
+try
+    fopen(s1); 
+catch err
+    disp(['WAS s1 CLOSED BEFORE?:',err.message]);
+end
 pause(2);
 
 % Starting pose
-x = tic;
-y = 0;
-while y < 5
-    baxter.setJointPosition('left',[-0.8544;-0.8805;0.1511;1.9934;-0.0418;-1.1789;-0.1457]);
-    baxter.setJointPosition('right',[0.6105;-1.0761;0.1806;2.2415;-0.0065;-1.1340;-1.7675]);
-    y = toc(x);
-end
+baxterJ.setControlMode(uint8(0)); % Position mode
+baxterJ.setJointCommand('left',[-0.7854;-1.0472;0;2.0944;0;-1.0472;-0]);
+baxterJ.setJointCommand('right',[0.7854;-1.0472;0;2.0944;0;-1.0472;-0]);
+pause(5);
+baxterJ.setControlMode(uint8(1)); % Velocity mode
 
 clc; disp('READY TO MOVE...');
 
 while(1) 
     
-    m.Data(1) = 0;
-    
+     % Gather Xbox input
+     xboxInput = xbox.controller_input;
+     if xboxInput.start_button
+        xInput = (0*-1 + 10000)* 130 /19000 + 137; 
+        yInput = (0 + 10000)* 130 /20000 - 19; 
+        fwrite(s1,char(xInput),'char');
+        fwrite(s1,char(yInput),'char');
+        baxterJ.setControlMode(uint8(0));
+        baxterJ.setJointCommand('left',[-0.7854;-1.0472;0;2.0944;0;-1.0472;-0]);
+        baxterJ.setJointCommand('right',[0.7854;-1.0472;0;2.0944;0;-1.0472;-0]);
+        pause(7);
+        baxterJ.setControlMode(uint8(1));
+    end    
+
+    % Set wheelchair velocity
+    xInput = (xboxInput.left_thumbstick_X*-1 + 10000)* 130 /19000 + 137; 
+    yInput = (xboxInput.left_thumbstick_Y + 10000)* 130 /20000 - 19; 
+    if(xInput > 255)
+       xInput = 255;
+    end
+    if(xInput < 158)
+       xInput = 158;
+    end
+    if(yInput > 82)
+       yInput = 82;
+    end
+    if(yInput < 0)
+       yInput = 0;
+    end
+    disp(xInput); disp(yInput);
+    fwrite(s1,char(xInput), 'char');
+    fwrite(s1,char(yInput), 'char'); 
+
     % Gather joint information
-    jointAngles = baxter.JointPositions;
+    jointAngles = baxterJ.joint_positions;
     jointAnglesLeft = jointAngles(1:7);
     jointAnglesRight = jointAngles(8:14);
-    
-    % Set desired input using Jamboxx
-    [linVel_L,linVel_R,wristVel_L,wristVel_R,grip_L,grip_R,rightSide] = setDesiredInputXbox(xbox,rightSide,baxter);
-    
+
     % Calculate full jacobian for both arms
     leftJ = jacobian(baxterConst.leftArm,jointAnglesLeft);
     rightJ = jacobian(baxterConst.rightArm,jointAnglesRight);
+    
+    % Set desired input using Jamboxx
+    [linVel_L,linVel_R,wristVel_L,wristVel_R,grip_L,grip_R,rightSide] = setDesiredInputXbox(xboxInput,rightSide,baxterJ); 
     
     % Desired velocities frame correction
         % Left arm
@@ -83,51 +131,40 @@ while(1)
     % Calculate desired joint angle velocities
         % Left arm
         dampCoeff_L = 0.1;
-        if any(allVel_L) || any(wristVel_L)
+        qDot_L = [0;0;0;0;0;0;0];
+        if any(allVel_L)
             qDot_L = leftJ'*pinv(leftJ*leftJ' + dampCoeff_L^2*eye(6,6))*allVel_L; %Damped least squares
-            if ~isempty(wristVel_L)
-                qDot_L(5:7) = wristVel_L;
-            end
-            % Limit joint velocity
-            for k = 1:length(qDot_L)
-                if abs(qDot_L(k)) > baxterConst.jointVelLimit(k)
-                    qDot_L(k) = sign(qDot_L(k))*baxterConst.jointVelLimit(k);
-                end
-            end   
-            m.Data(2:8) = qDot_L;
-        else
-            qDot_L = [0;0;0;0;0;0;0];
-            m.Data(2:8) = qDot_L;
         end
+        if ~isempty(wristVel_L)
+            qDot_L(5:7) = wristVel_L;
+        end
+
         % Right arm
         dampCoeff_R = 0.1;
-        if any(allVel_R)  || any(wristVel_R)
+        qDot_R = [0;0;0;0;0;0;0];
+        if any(allVel_R)
             qDot_R = rightJ'*pinv(rightJ*rightJ' + dampCoeff_R^2*eye(6,6))*allVel_R; %Damped least squares
-            if ~isempty(wristVel_R)
-                qDot_R(5:7) = wristVel_R;
-            end
-            % Limit joint velocity
-            for k = 1:length(qDot_R)
-                if abs(qDot_R(k)) > baxterConst.jointVelLimit(k)
-                    qDot_R(k) = sign(qDot_R(k))*baxterConst.jointVelLimit(k);
-                end
-            end  
-            m.Data(9:15) = qDot_R;
-        else
-            qDot_R = [0;0;0;0;0;0;0];
-            m.Data(9:15) = qDot_R;
-        end
+        end   
+        if ~isempty(wristVel_R)
+            qDot_R(5:7) = wristVel_R;
+        end 
+    
+    % Publish joint position
+    baxterJ.setControlMode(uint8(1));
+	baxterJ.setJointCommand('left',qDot_L);
+	baxterJ.setJointCommand('right',qDot_R);
         
     % Publish grip position
         % Left gripper
         if ~isempty(grip_L)
-            m.Data(16) = grip_L;
+            baxterP.setGripperPosition('left',grip_L);
         end
         %Right gripper
         if ~isempty(grip_R)
-            m.Data(17) = grip_R;
+            baxterP.setGripperPosition('right',grip_R);
         end
-        m.Data(1) = 1;
-        pause(0.1);
+
+   pause(0.1);
+
 end
 clc; msgbox('Program stopped!');

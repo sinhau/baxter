@@ -110,8 +110,6 @@ while(1)
     if(yInput < 0)
        yInput = 0;
     end
-    %disp(xInput);
-    %disp(yInput);
     fwrite(s1,char(xInput), 'char');
     fwrite(s1,char(yInput), 'char');  
 

@@ -139,7 +139,7 @@ while(1)
     else
         xInput = (xboxInput.left_thumbstick_X*-1 + 10000)* 130 /20000 + 127; 
         yInput = (xboxInput.left_thumbstick_Y + 10000)* 130 /20000;
-        xInput = limitVal(127,255,xInput); yInput = limitVal(0,129,yInput);
+        xInput = limitVal(129,255,xInput); yInput = limitVal(0,127,yInput);
         fwrite(s1,char(xInput), 'char'); disp(xInput);
         fwrite(s1,char(yInput), 'char'); disp(yInput);
         pause(0.1);

@@ -10,7 +10,7 @@ catch ME
 end
 
 % Arduino
-s1 = serial('/dev/ttyS102');    % define serial port
+s1 = serial('/dev/ttyS100');    % define serial port
 set(s1, 'DataBits', 8);
 set(s1, 'StopBits', 1);
 s1.BaudRate=9600;               % define baud rate

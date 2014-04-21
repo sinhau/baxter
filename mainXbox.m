@@ -4,21 +4,21 @@
 
 % Baxter joint connections
 try
-    baxterJ = RobotRaconteur.Connect('tcp://localhost:4676/BaxterJointServer/Baxter');
+    baxterJ = RobotRaconteur.Connect('tcp://localhost:4692/BaxterJointServer/Baxter');
 catch err
     disp(['CANNOT CONNECT TO BAXTER JOINT SERVER:',err.message]);
 end
 
 % Baxter peripherals connections
 try
-    baxterP = RobotRaconteur.Connect('tcp://localhost:4677/BaxterPeripheralServer/BaxterPeripherals');
+    baxterP = RobotRaconteur.Connect('tcp://localhost:4693/BaxterPeripheralServer/BaxterPeripherals');
 catch err
     disp(['CANNOT CONNECT TO BAXTER PERIPHERALS SERVER:',err.message]);
 end
 
 % Xbox 360 controller connection
 try
-    xbox = RobotRaconteur.Connect('tcp://192.168.1.103:5437/Xbox_controllerServer/xbox_controller');
+    xbox = RobotRaconteur.Connect('tcp://192.168.1.110:5437/Xbox_controllerServer/xbox_controller');
 catch err
     disp(['CANNOT CONNECT TO XBOX SERVER:',err.message]);
 end
@@ -35,7 +35,8 @@ angVel_L = [0;0;0];
 wristVel_L = [];
 grip_L = [];
 baxterP.calibrateGripper('left');
-pause(2);
+baxterP.setGripperHoldForce('left',100);
+baxterP.setGripperMoveForce('left',100);
 
 % Initialize right arm params
 linVel_R = [0;0;0];
@@ -43,11 +44,12 @@ angVel_R = [0;0;0];
 wristVel_R = [];
 grip_R = [];
 baxterP.calibrateGripper('right');
-pause(2);
+baxterP.setGripperHoldForce('right',100);
+baxterP.setGripperMoveForce('right',100);
 
 % Initialize serial communication
 try
-    s1 = serial('/dev/ttyS106'); % Define serial port
+    s1 = serial('/dev/ttyS100'); % Define serial port
 catch err
     disp(['CHECK IF SERIAL PORT IS VALID:',err.message]);
 end
@@ -76,8 +78,8 @@ while(1)
      % Gather Xbox input
      xboxInput = xbox.controller_input;
      if xboxInput.start_button
-        xInput = (0*-1 + 10000)* 130 /19000 + 137; 
-        yInput = (0 + 10000)* 130 /20000 - 19; 
+        xInput = (0*-1 + 10000)* 130 /20000 + 127; 
+        yInput = (0 + 10000)* 130 /20000; 
         fwrite(s1,char(xInput),'char');
         fwrite(s1,char(yInput),'char');
         baxterJ.setControlMode(uint8(0));
@@ -88,21 +90,9 @@ while(1)
     end    
 
     % Set wheelchair velocity
-    xInput = (xboxInput.left_thumbstick_X*-1 + 10000)* 130 /19000 + 137; 
-    yInput = (xboxInput.left_thumbstick_Y + 10000)* 130 /20000 - 19; 
-    if(xInput > 255)
-       xInput = 255;
-    end
-    if(xInput < 158)
-       xInput = 158;
-    end
-    if(yInput > 82)
-       yInput = 82;
-    end
-    if(yInput < 0)
-       yInput = 0;
-    end
-    disp(xInput); disp(yInput);
+    xInput = (xboxInput.left_thumbstick_X*-1 + 10000)* 130 /20000 + 127; 
+    yInput = (xboxInput.left_thumbstick_Y + 10000)* 130 /20000;
+    xInput = limitVal(129,255,xInput); yInput = limitVal(0,127,yInput);
     fwrite(s1,char(xInput), 'char');
     fwrite(s1,char(yInput), 'char'); 
 
